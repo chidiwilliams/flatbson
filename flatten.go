@@ -1,5 +1,4 @@
-// Package flatbson provides a function for recursively flattening a Go struct by its BSON tags.
-
+// Package flatbson provides a function for recursively flattening a Go struct using its BSON tags.
 package flatbson
 
 import (
@@ -28,7 +27,9 @@ import (
 //
 //     type X struct { Y string `bson:"y"` }
 //
-//     Flatten(A{nil, X{"hello"}}) returns map[string]interface{}{"c.y": "hello"}
+//     Flatten(A{nil, X{"hello"}})
+//     // Returns:
+//     // map[string]interface{}{"c.y": "hello"}
 func Flatten(v interface{}) (map[string]interface{}, error) {
 	val := reflect.ValueOf(v)
 

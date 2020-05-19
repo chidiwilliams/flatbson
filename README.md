@@ -1,8 +1,8 @@
 # flatbson
 
-flatbson recursively flattens a Go struct by its BSON tags.
+flatbson recursively flattens a Go struct using its BSON tags.
 
-See [Godoc](https://pkg.go.dev/mod/github.com/chidiwilliams/flatbson) for full documentation.
+See [Godoc](https://pkg.go.dev/github.com/chidiwilliams/flatbson) for full documentation.
 
 ## Example
 
