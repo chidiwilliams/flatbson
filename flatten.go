@@ -26,6 +26,7 @@ func Flatten(v interface{}) (map[string]interface{}, error) {
 }
 
 func flattenFields(v reflect.Value, m map[string]interface{}, p string) error {
+	fmt.Println(p)
 	for i := 0; i < v.NumField(); i++ {
 		tags, _ := bsoncodec.DefaultStructTagParser(v.Type().Field(i))
 
@@ -40,14 +41,17 @@ func flattenFields(v reflect.Value, m map[string]interface{}, p string) error {
 
 		s, ok := asStruct(field)
 		if ok {
-			if err := flattenFields(s, m, p+tags.Name+"."); err != nil {
+			fp := p
+			if !tags.Inline {
+				fp = p + tags.Name + "."
+			}
+			if err := flattenFields(s, m, fp); err != nil {
 				return err
 			}
 			continue
 		}
 
 		key := p + tags.Name
-
 		if _, ok = m[key]; ok {
 			return fmt.Errorf("duplicated key %s", key)
 		}

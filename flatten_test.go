@@ -67,6 +67,21 @@ type duplicateNestedLeaf struct {
 	B int `bson:"a"`
 }
 
+type inlineRoot struct {
+	A inlineBranch `bson:"a,inline"`
+	X string       `bson:"x"`
+}
+
+type inlineBranch struct {
+	B inlineLeaf `bson:"b,inline"`
+	Y int        `bson:"y"`
+}
+
+type inlineLeaf struct {
+	C string   `bson:"c,inline"`
+	Z []string `bson:"z"`
+}
+
 func TestFlatten(t *testing.T) {
 	type args struct {
 		v interface{}
@@ -80,7 +95,6 @@ func TestFlatten(t *testing.T) {
 		{
 			name: "non-struct input",
 			args: args{v: 23},
-			want: nil,
 			err:  errors.New("v must be a struct or a pointer to a struct"),
 		},
 		{
@@ -91,7 +105,6 @@ func TestFlatten(t *testing.T) {
 		{
 			name: "duplicate keys",
 			args: args{duplicateRoot{"as", 12}},
-			want: nil,
 			err:  errors.New("duplicated key a"),
 		},
 		{
@@ -119,6 +132,11 @@ func TestFlatten(t *testing.T) {
 			name: "omitempty fields",
 			args: args{v: omitemptyRoot{0, 0, omitemptyLeaf{"", nil, []string{}}}},
 			want: map[string]interface{}{"b": 0, "c.c": []string{}},
+		},
+		{
+			name: "inline fields",
+			args: args{inlineRoot{inlineBranch{inlineLeaf{"abc", []string{"jd"}}, 34}, "rwr"}},
+			want: map[string]interface{}{"c": "abc", "z": []string{"jd"}, "y": 34, "x": "rwr"},
 		},
 	}
 

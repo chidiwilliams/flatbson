@@ -14,7 +14,7 @@ Flattens nested BSON documents
 
 - [ ] Inline
 
-    - [ ] Struct
+    - [x] Struct
 
     - [ ] Map
 
