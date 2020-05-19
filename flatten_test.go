@@ -30,6 +30,28 @@ type nestedRootPtr struct {
 	A *nestedLeaf `bson:"a"`
 }
 
+type skipRoot struct {
+	A int      `bson:"-"`
+	B skipLeaf `bson:"b"`
+}
+
+type skipLeaf struct {
+	C string `bson:"-"`
+	D int    `bson:"d"`
+}
+
+type omitemptyRoot struct {
+	A int           `bson:"a,omitempty"`
+	B int           `bson:"b"`
+	C omitemptyLeaf `bson:"c"`
+}
+
+type omitemptyLeaf struct {
+	A string      `bson:"a,omitempty"`
+	B interface{} `bson:"b,omitempty"`
+	C []string    `bson:"c"`
+}
+
 func TestFlatten(t *testing.T) {
 	type args struct {
 		v interface{}
@@ -60,6 +82,16 @@ func TestFlatten(t *testing.T) {
 			name: "nested fields with ptrs",
 			args: args{v: nestedRootPtr{A: &nestedLeaf{B: 23}}},
 			want: map[string]interface{}{"a.b": 23},
+		},
+		{
+			name: "skip fields",
+			args: args{v: skipRoot{1, skipLeaf{"23", 74}}},
+			want: map[string]interface{}{"b.d": 74},
+		},
+		{
+			name: "omitempty fields",
+			args: args{v: omitemptyRoot{0, 0, omitemptyLeaf{"", nil, []string{}}}},
+			want: map[string]interface{}{"b": 0, "c.c": []string{}},
 		},
 	}
 

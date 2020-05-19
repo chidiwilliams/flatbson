@@ -8,9 +8,9 @@ Flattens nested BSON documents
 
 - [x] Nested fields
 
-- [ ] Skip
+- [x] Skip
 
-- [ ] Omitempty
+- [x] Omitempty
 
 - [ ] Inline
 

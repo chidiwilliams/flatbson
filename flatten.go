@@ -25,7 +25,15 @@ func flattenFields(v reflect.Value, m map[string]interface{}, p string) {
 	for i := 0; i < v.NumField(); i++ {
 		tags, _ := bsoncodec.DefaultStructTagParser(v.Type().Field(i))
 
+		if tags.Skip {
+			continue
+		}
+
 		field := v.Field(i)
+		if tags.OmitEmpty && field.IsZero() {
+			continue
+		}
+
 		s, ok := asStruct(field)
 		if ok {
 			flattenFields(s, m, p+tags.Name+".")
