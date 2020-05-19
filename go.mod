@@ -1,4 +1,4 @@
-module flatbson
+module github.com/chidiwilliams/flatbson
 
 go 1.13
 

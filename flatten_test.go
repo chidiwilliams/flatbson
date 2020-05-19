@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"flatbson"
+	"github.com/chidiwilliams/flatbson"
 )
 
 type root struct {
