@@ -2,6 +2,7 @@ package flatbson
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 
 	"go.mongodb.org/mongo-driver/bson/bsoncodec"
@@ -17,11 +18,14 @@ func Flatten(v interface{}) (map[string]interface{}, error) {
 	}
 
 	m := make(map[string]interface{})
-	flattenFields(val, m, "")
+	if err := flattenFields(val, m, ""); err != nil {
+		return nil, err
+	}
+
 	return m, nil
 }
 
-func flattenFields(v reflect.Value, m map[string]interface{}, p string) {
+func flattenFields(v reflect.Value, m map[string]interface{}, p string) error {
 	for i := 0; i < v.NumField(); i++ {
 		tags, _ := bsoncodec.DefaultStructTagParser(v.Type().Field(i))
 
@@ -36,12 +40,22 @@ func flattenFields(v reflect.Value, m map[string]interface{}, p string) {
 
 		s, ok := asStruct(field)
 		if ok {
-			flattenFields(s, m, p+tags.Name+".")
+			if err := flattenFields(s, m, p+tags.Name+"."); err != nil {
+				return err
+			}
 			continue
 		}
 
-		m[p+tags.Name] = field.Interface()
+		key := p + tags.Name
+
+		if _, ok = m[key]; ok {
+			return fmt.Errorf("duplicated key %s", key)
+		}
+
+		m[key] = field.Interface()
 	}
+
+	return nil
 }
 
 func asStruct(v reflect.Value) (reflect.Value, bool) {

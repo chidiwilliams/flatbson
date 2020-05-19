@@ -14,8 +14,12 @@ Flattens nested BSON documents
 
 - [ ] Inline
 
+    - [ ] Struct
+
+    - [ ] Map
+
 ## Errors
 
 - [x] Input is not a struct or pointer to a struct
 
-- [ ] Fields with duplicate tag names?
+- [x] Fields with duplicate tag names

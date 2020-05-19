@@ -52,6 +52,21 @@ type omitemptyLeaf struct {
 	C []string    `bson:"c"`
 }
 
+type duplicateRoot struct {
+	A string `bson:"a,omitempty"`
+	B int    `bson:"a,omitempty"`
+}
+
+type duplicateNestedRoot struct {
+	A string              `bson:"a"`
+	B duplicateNestedLeaf `bson:""`
+}
+
+type duplicateNestedLeaf struct {
+	A int `bson:"a"`
+	B int `bson:"a"`
+}
+
 func TestFlatten(t *testing.T) {
 	type args struct {
 		v interface{}
@@ -72,6 +87,18 @@ func TestFlatten(t *testing.T) {
 			name: "root fields",
 			args: args{root{"az", 5}},
 			want: map[string]interface{}{"a": "az", "b": 5},
+		},
+		{
+			name: "duplicate keys",
+			args: args{duplicateRoot{"as", 12}},
+			want: nil,
+			err:  errors.New("duplicated key a"),
+		},
+		{
+			name: "duplicate nested keys",
+			args: args{duplicateNestedRoot{"as", duplicateNestedLeaf{1, 2}}},
+			want: nil,
+			err:  errors.New("duplicated key b.a"),
 		},
 		{
 			name: "nested fields",
