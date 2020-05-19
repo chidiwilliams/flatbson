@@ -1,25 +1,29 @@
 # flatbson
 
-Flattens nested BSON documents
+flatbson recursively flattens a Go struct by its BSON tags.
 
-## Field types and tags
+See [Godoc]() for full documentation.
 
-- [x] Root fields
+## Example
 
-- [x] Nested fields
+```go
+type Parent struct {
+	B *Child `bson:"b,omitempty"`
+	C Child  `bson:"c"`
+}
 
-- [x] Skip
+type Child struct {
+	Y string `bson:"y"`
+}
 
-- [x] Omitempty
+flatbson.Flatten(Parent{nil, Child{"hello"}})
 
-- [ ] Inline
+// Result:
+// map[string]interface{}{"c.y": "hello"}
+```
 
-    - [x] Struct
+## Installation
 
-    - [ ] Map
-
-## Errors
-
-- [x] Input is not a struct or pointer to a struct
-
-- [x] Fields with duplicate tag names
+```shell script
+go get https://github.com/chidiwilliams/flatbson
+```

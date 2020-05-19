@@ -1,3 +1,5 @@
+// Package flatbson provides a function for recursively flattening a Go struct by its BSON tags.
+
 package flatbson
 
 import (
@@ -8,7 +10,25 @@ import (
 	"go.mongodb.org/mongo-driver/bson/bsoncodec"
 )
 
-// Flatten flattens a nested BSON struct.
+// Flatten returns a map with keys and values corresponding to the field name
+// and values of struct v and its nested structs according to its BSON tags.
+// It iterates over each field recursively and sets fields that are not nil.
+//
+// The BSON struct tags behave in line with the bsoncodec specification. See:
+// https://godoc.org/go.mongodb.org/mongo-driver/bson/bsoncodec#StructTags
+// for definitions. The supported tags are name, skip, omitempty, and inline.
+//
+// Flatten returns an error if v is not a struct or a pointer to a struct, or
+// if the tags produce duplicate keys.
+//
+//     type A struct {
+//       B *X `bson:"b,omitempty"`
+//       C X  `bson:"c"`
+//     }
+//
+//     type X struct { Y string `bson:"y"` }
+//
+//     Flatten(A{nil, X{"hello"}}) returns map[string]interface{}{"c.y": "hello"}
 func Flatten(v interface{}) (map[string]interface{}, error) {
 	val := reflect.ValueOf(v)
 
