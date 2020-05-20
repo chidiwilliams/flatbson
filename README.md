@@ -1,6 +1,6 @@
 # flatbson
 
-[![API reference](https://img.shields.io/badge/godoc-reference-5272B4)](https://pkg.go.dev/github.com/chidiwilliams/flatbson?tab=doc)
+[![API reference](https://img.shields.io/badge/godoc-reference-5272B4)](https://pkg.go.dev/github.com/chidiwilliams/flatbson?tab=doc) [![codecov](https://codecov.io/gh/chidiwilliams/flatbson/branch/master/graph/badge.svg)](https://codecov.io/gh/chidiwilliams/flatbson)
 
 flatbson recursively flattens a Go struct using its BSON tags.
 
