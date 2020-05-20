@@ -1,10 +1,8 @@
 # flatbson
 
+[![API reference](https://img.shields.io/badge/godoc-reference-5272B4)](https://pkg.go.dev/github.com/chidiwilliams/flatbson?tab=doc)
+
 flatbson recursively flattens a Go struct using its BSON tags.
-
-See [Godoc](https://pkg.go.dev/github.com/chidiwilliams/flatbson) for full documentation.
-
-## Example
 
 ```go
 type Parent struct {
@@ -21,6 +19,8 @@ flatbson.Flatten(Parent{nil, Child{"hello"}})
 // Result:
 // map[string]interface{}{"c.y": "hello"}
 ```
+
+See the [Godoc](https://pkg.go.dev/github.com/chidiwilliams/flatbson) for the complete documentation.
 
 ## Installation
 
