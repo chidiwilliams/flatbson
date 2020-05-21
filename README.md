@@ -1,28 +1,38 @@
-# flatbson
+# FlatBSON
 
-[![API reference](https://img.shields.io/badge/godoc-reference-5272B4)](https://pkg.go.dev/github.com/chidiwilliams/flatbson?tab=doc) [![codecov](https://codecov.io/gh/chidiwilliams/flatbson/branch/master/graph/badge.svg)](https://codecov.io/gh/chidiwilliams/flatbson)
+[![Build status](https://github.com/chidiwilliams/flatbson/workflows/Build/badge.svg)](https://github.com/chidiwilliams/flatbson/actions?query=workflow%3ABuild) [![API reference](https://img.shields.io/badge/godoc-reference-5272B4)](https://pkg.go.dev/github.com/chidiwilliams/flatbson?tab=doc) [![codecov](https://codecov.io/gh/chidiwilliams/flatbson/branch/master/graph/badge.svg)](https://codecov.io/gh/chidiwilliams/flatbson)
 
-flatbson recursively flattens a Go struct using its BSON tags.
+FlatBSON recursively flattens a Go struct using its BSON tags.
+
+It is particularly useful for partially updating embedded Mongo documents.
+
+For example, to update a `User`'s `Address.Visited` field, first call `flatbson.Flatten` with the parent struct:
 
 ```go
-type Parent struct {
-	B *Child `bson:"b,omitempty"`
-	C Child  `bson:"c"`
+type User struct {
+  ID      bson.ObjectID `bson:"_id,omitempty"`
+  Name    string        `bson:"name,omitempty"`
+  Address Address       `bson:"address,omitempty"`
 }
 
-type Child struct {
-	Y string `bson:"y"`
+type Address struct {
+  Street    string    `bson:"street,omitempty"`
+  City      string    `bson:"city,omitempty"`
+  State     string    `bson:"state,omitempty"`
+  VisitedAt time.Time `bson:"visitedAt,omitempty"`
 }
 
-flatbson.Flatten(Parent{nil, Child{"hello"}})
+flatbson.Flatten(User{Address: {VisitedAt: time.Now().UTC()}})
 
 // Result:
-// map[string]interface{}{"c.y": "hello"}
+// map[string]interface{}{"address.visitedAt": "2020-05-21T09:34:14.198Z"}
 ```
 
-See the [Godoc](https://pkg.go.dev/github.com/chidiwilliams/flatbson) for the complete documentation.
+Passing the result to the `coll.UpdateOne` command updates only the `address.VisitedAt` field instead of overwriting the entire `address` embedded document. See this blog post for more information.
 
-## Installation
+The complete documentation is available on [Godoc](https://pkg.go.dev/github.com/chidiwilliams/flatbson).
+
+## How to Install
 
 ```shell script
 go get https://github.com/chidiwilliams/flatbson
