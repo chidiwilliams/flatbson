@@ -25,10 +25,10 @@ type Address struct {
 flatbson.Flatten(User{Address: {VisitedAt: time.Now().UTC()}})
 
 // Result:
-// map[string]interface{}{"address.visitedAt": "2020-05-21T09:34:14.198Z"}
+// map[string]interface{}{"address.visitedAt": time.Time{...}}
 ```
 
-Passing the result to the `coll.UpdateOne` command updates only the `address.VisitedAt` field instead of overwriting the entire `address` embedded document. See this blog post for more information.
+Passing the result to `coll.UpdateOne` updates only the `address.VisitedAt` field instead of overwriting the entire `address` embedded document. See this blog post for more information.
 
 The complete documentation is available on [Godoc](https://pkg.go.dev/github.com/chidiwilliams/flatbson).
 
