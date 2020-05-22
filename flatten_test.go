@@ -82,6 +82,14 @@ type inlineLeaf struct {
 	Z []string `bson:"z"`
 }
 
+type unexportedRoot struct {
+	A unexportedLeaf `bson:"a"`
+}
+
+type unexportedLeaf struct {
+	b string
+}
+
 func TestFlatten(t *testing.T) {
 	type args struct {
 		v interface{}
@@ -137,6 +145,11 @@ func TestFlatten(t *testing.T) {
 			name: "inline fields",
 			args: args{inlineRoot{inlineBranch{inlineLeaf{"abc", []string{"jd"}}, 34}, "rwr"}},
 			want: map[string]interface{}{"c": "abc", "z": []string{"jd"}, "y": 34, "x": "rwr"},
+		},
+		{
+			name: "unexported fields",
+			args: args{unexportedRoot{unexportedLeaf{"abc"}}},
+			want: map[string]interface{}{"a": unexportedLeaf{"abc"}},
 		},
 	}
 

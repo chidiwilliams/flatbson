@@ -17,8 +17,9 @@ import (
 // https://godoc.org/go.mongodb.org/mongo-driver/bson/bsoncodec#StructTags
 // for definitions. The supported tags are name, skip, omitempty, and inline.
 //
-// Flatten returns an error if v is not a struct or a pointer to a struct, or
-// if the tags produce duplicate keys.
+// Flatten does not flatten structs with unexported fields, e.g. time.Time.
+// It returns an error if v is not a struct or a pointer to a struct, or if
+// the tags produce duplicate keys.
 //
 //     type A struct {
 //       B *X `bson:"b,omitempty"`
@@ -46,6 +47,7 @@ func Flatten(v interface{}) (map[string]interface{}, error) {
 	return m, nil
 }
 
+// flattenFields recursively adds the values of v's fields to map m.
 func flattenFields(v reflect.Value, m map[string]interface{}, p string) error {
 	for i := 0; i < v.NumField(); i++ {
 		tags, _ := bsoncodec.DefaultStructTagParser(v.Type().Field(i))
@@ -59,7 +61,7 @@ func flattenFields(v reflect.Value, m map[string]interface{}, p string) error {
 			continue
 		}
 
-		if s, ok := asStruct(field); ok {
+		if s, ok := asStruct(field); ok && !hasUnexportedField(s) {
 			fp := p
 			if !tags.Inline {
 				fp = p + tags.Name + "."
@@ -81,6 +83,10 @@ func flattenFields(v reflect.Value, m map[string]interface{}, p string) error {
 	return nil
 }
 
+// asStruct returns that value of v as a struct.
+// 	- If v is already a struct, it is returned immediately.
+// 	- If v is a pointer, it is dereferenced till a struct is found.
+// 	- If a non-struct value is found, it returns false.
 func asStruct(v reflect.Value) (reflect.Value, bool) {
 	for {
 		switch v.Kind() {
@@ -92,4 +98,15 @@ func asStruct(v reflect.Value) (reflect.Value, bool) {
 			return reflect.Value{}, false
 		}
 	}
+}
+
+// hasUnexportedField returns true if struct s has a field
+// that is not exported.
+func hasUnexportedField(s reflect.Value) bool {
+	for i := 0; i < s.NumField(); i++ {
+		if !s.Field(i).CanInterface() {
+			return true
+		}
+	}
+	return false
 }
