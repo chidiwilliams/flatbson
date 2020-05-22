@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/bsoncodec"
 )
 
@@ -61,15 +62,19 @@ func flattenFields(v reflect.Value, m map[string]interface{}, p string) error {
 			continue
 		}
 
-		if s, ok := asStruct(field); ok && !hasUnexportedField(s) {
-			fp := p
-			if !tags.Inline {
-				fp = p + tags.Name + "."
+		// If the field can marshal itself into a BSON type, or it's a struct with
+		// unexported fields, like time.Time, we shouldn't recurse into its fields.
+		if _, ok := field.Interface().(bson.ValueMarshaler); !ok {
+			if s, ok := asStruct(field); ok && !hasUnexportedField(s) {
+				fp := p
+				if !tags.Inline {
+					fp = p + tags.Name + "."
+				}
+				if err := flattenFields(s, m, fp); err != nil {
+					return err
+				}
+				continue
 			}
-			if err := flattenFields(s, m, fp); err != nil {
-				return err
-			}
-			continue
 		}
 
 		key := p + tags.Name

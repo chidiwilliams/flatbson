@@ -5,6 +5,9 @@ import (
 	"reflect"
 	"testing"
 
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/bsontype"
+
 	"github.com/chidiwilliams/flatbson"
 )
 
@@ -90,6 +93,18 @@ type unexportedLeaf struct {
 	b string
 }
 
+type customBSONTypeRoot struct {
+	A customBSONTypeLeaf `bson:"a"`
+}
+
+type customBSONTypeLeaf struct {
+	S string
+}
+
+func (c customBSONTypeLeaf) MarshalBSONValue() (bsontype.Type, []byte, error) {
+	return bson.MarshalValue(c.S)
+}
+
 func TestFlatten(t *testing.T) {
 	type args struct {
 		v interface{}
@@ -150,6 +165,11 @@ func TestFlatten(t *testing.T) {
 			name: "unexported fields",
 			args: args{unexportedRoot{unexportedLeaf{"abc"}}},
 			want: map[string]interface{}{"a": unexportedLeaf{"abc"}},
+		},
+		{
+			name: "fields that can marshal themselves",
+			args: args{customBSONTypeRoot{customBSONTypeLeaf{"abc"}}},
+			want: map[string]interface{}{"a": customBSONTypeLeaf{"abc"}},
 		},
 	}
 
