@@ -58,14 +58,14 @@ func flattenFields(v reflect.Value, m map[string]interface{}, p string) error {
 		}
 
 		field := v.Field(i)
-		if tags.OmitEmpty && field.IsZero() {
+		if tags.OmitEmpty && field.IsZero() || !field.CanInterface() {
 			continue
 		}
 
-		// If the field can marshal itself into a BSON type, or it's a struct with
-		// unexported fields, like time.Time, we shouldn't recurse into its fields.
+		// If the field can marshal itself into a BSON type, or it's a struct has no
+		// exported fields, like time.Time, we shouldn't recurse into its fields.
 		if _, ok := field.Interface().(bson.ValueMarshaler); !ok {
-			if s, ok := asStruct(field); ok && !hasUnexportedField(s) {
+			if s, ok := asStruct(field); ok && hasExportedField(s) {
 				fp := p
 				if !tags.Inline {
 					fp = p + tags.Name + "."
@@ -107,9 +107,9 @@ func asStruct(v reflect.Value) (reflect.Value, bool) {
 
 // hasUnexportedField returns true if struct s has a field
 // that is not exported.
-func hasUnexportedField(s reflect.Value) bool {
+func hasExportedField(s reflect.Value) bool {
 	for i := 0; i < s.NumField(); i++ {
-		if !s.Field(i).CanInterface() {
+		if s.Field(i).CanInterface() {
 			return true
 		}
 	}
