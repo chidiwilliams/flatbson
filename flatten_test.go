@@ -16,6 +16,12 @@ type root struct {
 	B int    `bson:"b"`
 }
 
+type rootWithExportedField struct {
+	A string `bson:"a"`
+	B int    `bson:"b"`
+	c int    `bson:"c"`
+}
+
 type nestedRoot struct {
 	A nestedLeaf   `bson:"a"`
 	B nestedBranch `bson:"b"`
@@ -89,10 +95,17 @@ type unexportedRoot struct {
 	A unexportedLeaf `bson:"a"`
 }
 
+type mixedExportedUnexportedRoot struct {
+	A mixedExportedUnexportedLeaf `bson:"a"`
+}
 type unexportedLeaf struct {
 	b string
 }
 
+type mixedExportedUnexportedLeaf struct {
+	b string `bson:"b"`
+	D string `bson:"d"`
+}
 type customBSONTypeRoot struct {
 	A customBSONTypeLeaf `bson:"a"`
 }
@@ -170,6 +183,16 @@ func TestFlatten(t *testing.T) {
 			name: "fields that can marshal themselves",
 			args: args{customBSONTypeRoot{customBSONTypeLeaf{"abc"}}},
 			want: map[string]interface{}{"a": customBSONTypeLeaf{"abc"}},
+		},
+		{
+			name: "with unexported field in root struct",
+			args: args{rootWithExportedField{"az", 5, 10}},
+			want: map[string]interface{}{"a": "az", "b": 5},
+		},
+		{
+			name: "nested struct has unexported field",
+			args: args{mixedExportedUnexportedRoot{mixedExportedUnexportedLeaf{"abc", "bc"}}},
+			want: map[string]interface{}{"a.d": "bc"},
 		},
 	}
 
