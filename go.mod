@@ -1,5 +1,5 @@
-module github.com/chidiwilliams/flatbson
+module github.com/8arcturus/flatbson
 
-go 1.13
+go 1.19
 
-require go.mongodb.org/mongo-driver v1.3.3
+require go.mongodb.org/mongo-driver v1.11.0

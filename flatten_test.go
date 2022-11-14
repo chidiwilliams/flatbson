@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/bsontype"
 
-	"github.com/chidiwilliams/flatbson"
+	"github.com/8arcturus/flatbson"
 )
 
 type root struct {

@@ -35,5 +35,5 @@ The complete documentation is available on [Godoc](https://pkg.go.dev/github.com
 ## How to Install
 
 ```shell script
-go get -v github.com/chidiwilliams/flatbson
+go get -v github.com/8arcturus/flatbson
 ```
